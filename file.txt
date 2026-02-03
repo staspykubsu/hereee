@@ -33,3 +33,11 @@ def mission_create_view(request):
         'title': 'Создание новой миссии',
     }
     return render(request, 'space_app/mission_form.html', context)
+
+
+исправить
+doctor = Doctor.objects.get(id=doctor_id)
+на
+from django.shortcuts import get_object_or_404
+
+doctor = get_object_or_404(Doctor, id=doctor_id)
