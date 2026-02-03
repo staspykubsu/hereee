@@ -41,3 +41,60 @@ doctor = Doctor.objects.get(id=doctor_id)
 from django.shortcuts import get_object_or_404
 
 doctor = get_object_or_404(Doctor, id=doctor_id)
+
+
+
+
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Review(models.Model):
+    # Кто оставил отзыв
+    reviewer = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        verbose_name='Автор отзыва',
+        related_name='medical_reviews',  # user.medical_reviews.all()
+        null=True,
+        blank=True,
+        help_text='Пользователь, оставивший отзыв'
+    )
+    
+    # На кого оставлен отзыв
+    doctor = models.ForeignKey(
+        'Doctor',
+        on_delete=models.CASCADE,
+        verbose_name='Врач',
+        related_name='reviews'  # doctor.reviews.all()
+    )
+    
+    # Дополнительное поле для анонимности
+    is_anonymous = models.BooleanField(
+        default=False,
+        verbose_name='Анонимный отзыв'
+    )
+    
+    # Текст отзыва
+    content = models.TextField(
+        verbose_name='Текст отзыва',
+        max_length=2000
+    )
+    
+    # Дата создания
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата создания'
+    )
+    
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        if self.reviewer:
+            return f"Отзыв от {self.reviewer.username} на {self.doctor}"
+        else:
+            return f"Анонимный отзыв на {self.doctor}"
